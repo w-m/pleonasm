@@ -23,7 +23,7 @@
       ga('send', 'pageview');
 
     </script>
-  
+
   </head>
 
   <body>
@@ -43,17 +43,17 @@
 
 		<div id="pleonasm-app">
 
-		<div class="input-group" style="font-family:monospace;font-size:12pt;">
-			<span class="input-group-addon">Hex&nbsp;</span>
+		<div class="input-group">
+			<span class="input-group-addon pleonasm-input">Hex&nbsp;</span>
 			<input id='source' type='text'
-					class="form-control"
+					class="form-control pleonasm-input"
 					value='0123456789abcdef'
 					onkeyup='sourceChanged(this);'
 					onkeyup='sourceChanged(this);'
 					onchange='sourceChanged(this);'
 					onpaste='sourceChanged(this);'
 					autocomplete='off'
-					style="font-family:monospace;font-size:12pt;width:100%;" />
+					/>
 
 		      <span class="input-group-btn">
 		        <button class="btn btn-default" type="button" onclick='createColor();'>rnd(6)</button>
@@ -63,25 +63,24 @@
 		      </span>
 		</div>
 
-		<div class="input-group" style="font-family:monospace;font-size:12pt;">
-			<span class="input-group-addon">Alph</span>
-			<input id = "translated" style="white-space:pre-wrap;display:inline-block;font-family:monospace;font-size:12pt;width:100%;"
-			class="form-control" disabled/>
+		<div class="input-group">
+			<span class="input-group-addon pleonasm-input">Alph</span>
+			<input id = "translated" class="form-control pleonasm-input" disabled/>
 		</div>
 
-		<div class="input-group" style="font-family:monospace;font-size:12pt;">
-			<span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-			<input id="spaced" class="form-control" style="white-space:pre-wrap;display:inline-block;font-family:monospace;font-size:12pt;width:100%;" disabled/>
+		<div class="input-group">
+			<span class="input-group-addon pleonasm-input">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<input id="spaced" class="form-control pleonasm-input" disabled/>
 		</div>
 
-		<div class="input-group" style="font-family:monospace;font-size:12pt;">
-			<span class="input-group-addon">Code</span>
+		<div class="input-group">
+			<span class="input-group-addon pleonasm-input">Code</span>
 			<input id="mnemonic"
 				onkeyup='codeChanged(this);'
 				onkeyup='codeChanged(this);'
 				onchange='codeChanged(this);'
 				onpaste='codeChanged(this);'
-				class="form-control" style="white-space:pre-wrap;display:inline-block;font-family:monospace;font-size:12pt;width:100%;" />
+				class="form-control pleonasm-input" />
 		</div>
 		<br>
 		<div class="progress">

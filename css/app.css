@@ -10,4 +10,9 @@ body {
 #pleonasm-app {
   padding-top: 30px;
   padding-bottom: 30px;
+  font-family: monospace;
+}
+
+.pleonasm-input {
+  font-size:12pt;
 }
