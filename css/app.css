@@ -1,0 +1,13 @@
+body {
+  padding-bottom: 50px;
+}
+
+.jumbotron {
+  background-color: #403aa9;
+  color: #eeeeee;
+}
+
+#pleonasm-app {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}

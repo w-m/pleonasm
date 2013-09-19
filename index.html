@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ple&middot;o&middot;nasm</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="css/app.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <div class="jumbotron">
+      <div class="container">
+
+        <h1>ple&middot;o&middot;nasm</h1>
+        <p class="lead">
+					Create English phrases from hex strings that are easier to recognize and remember.</p>
+      </div>
+    </div>
+
+    <div class="container">
+
+		<div id="pleonasm-app">
+
+		<div class="input-group" style="font-family:monospace;font-size:12pt;">
+			<span class="input-group-addon">Hex&nbsp;</span>
+			<input id='source' type='text'
+					class="form-control"
+					value='0123456789abcdef'
+					onkeyup='sourceChanged(this);'
+					onkeyup='sourceChanged(this);'
+					onchange='sourceChanged(this);'
+					onpaste='sourceChanged(this);'
+					autocomplete='off'
+					style="font-family:monospace;font-size:12pt;width:100%;" />
+
+		      <span class="input-group-btn">
+		        <button class="btn btn-default" type="button" onclick='createColor();'>rnd(6)</button>
+		      </span>
+		      <span class="input-group-btn">
+		        <button class="btn btn-default" type="button" onclick='createHash();'>rnd(20)</button>
+		      </span>
+		</div>
+
+		<div class="input-group" style="font-family:monospace;font-size:12pt;">
+			<span class="input-group-addon">Alph</span>
+			<input id = "translated" style="white-space:pre-wrap;display:inline-block;font-family:monospace;font-size:12pt;width:100%;"
+			class="form-control" disabled/>
+		</div>
+
+		<div class="input-group" style="font-family:monospace;font-size:12pt;">
+			<span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<input id="spaced" class="form-control" style="white-space:pre-wrap;display:inline-block;font-family:monospace;font-size:12pt;width:100%;" disabled/>
+		</div>
+
+		<div class="input-group" style="font-family:monospace;font-size:12pt;">
+			<span class="input-group-addon">Code</span>
+			<input id="mnemonic"
+				onkeyup='codeChanged(this);'
+				onkeyup='codeChanged(this);'
+				onchange='codeChanged(this);'
+				onpaste='codeChanged(this);'
+				class="form-control" style="white-space:pre-wrap;display:inline-block;font-family:monospace;font-size:12pt;width:100%;" />
+		</div>
+		<br>
+		<div class="progress">
+		  <div id="color-progress" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+		  style="width: 100%;">
+		    <span class="sr-only">Color Well</span>
+		  </div>
+		</div>
+
+	</div>
+			<h2>Human-readable representation</h2>
+
+				<p>
+					<code>0123456789abcdef</code> are the symbols which are usually used to represent hexadecimal (base16) numbers. 
+				</p>
+				<p>
+					<code>ulkmhpvtwgnbcdyf</code> is what pleonasm uses - 16 letters from the English alphabet.
+				</p>
+				<p>
+					Thus, <code>a815</code> would be written as <code>nwlp</code>.
+					</p>
+					<p>
+						The alphabet contains 10 more letters which are not used as symbols (<code>aeijoqrsxz</code>). They are inserted between the symbols to form proper words. In this case, the string <code>answer loop</code> will be created, which might be preferable to <code>a815</code>.
+				</p>
+
+	    <h2>No information is lost</h2>
+	    <p>
+		    The created words carry the same information as the hex number and can be decoded easily back to hex. Removing the non-symbol letters and white spaces from <code>answer loop</code> yields <code>nwlp</code>, which is just <code>a815</code> written with different symbols.
+	    </p>
+	    <p>
+	    	The dictionary that is used to create the phrases contains over 50,000 words. Given random input, words will rarely be repeated.
+	    </p>
+
+	    <h2>Simple Encoding</h2>
+	    	<p>To form phrase-like word groups, a simple scheme is used: verb, adjective, noun, verb, adjective, noun, ...</p>
+	    	<p>For each word, the longest match is picked from the provided dictionary. Many thousand characters per second can be encoded.</p>
+
+	    <h2>Trivial Decoding</h2>
+			<p>
+	      The dictionary, which is needed for encoding, is <b>not</b> needed for decoding. Only the 16-letter alphabet (symbol represenation) has to be known. The following Python code forms a complete decoder:
+			</p>		
+
+
+<pre>
+alphabet = <span style='color:#2a00ff; '>'ulkmhpvtwgnbcdyf'</span>
+target = <span style='color:#2a00ff; '>'0123456789abcdef'</span>
+<span style='color:#7f0055; font-weight:bold; '>def</span> decode(words):
+  <span style='color:#3f7f59; '># filter out redundant characters</span>
+  words = filter(lambda char: char <span style='color:#7f0055; font-weight:bold; '>in</span> alphabet, words)
+
+  <span style='color:#3f7f59; '># translate to hex</span>
+  <span style='color:#7f0055; font-weight:bold; '>for</span> replacement, org <span style='color:#7f0055; font-weight:bold; '>in</span> zip(alphabet, target):
+    words = words.replace(replacement, org)
+  <span style='color:#7f0055; font-weight:bold; '>return</span> words
+</pre>
+
+  </div><!-- /.container -->
+
+	 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+	<script src="js/pleonasm.js"></script>
+	<script src="js/app.js"></script>
+  </body>
+</html>
