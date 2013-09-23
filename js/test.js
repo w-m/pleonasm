@@ -1,5 +1,4 @@
 
-
 function loadTest(testFileName, dataCallBack) {
 	var client = new XMLHttpRequest();
 	client.open('GET', 'tests/' + testFileName);
@@ -39,8 +38,7 @@ function check_file(data) {
 	document.body.innerHTML += ("<p>" + tests + " test cases successful!" + "</p");
 }
 
-
-$(document).on("pleonasm-ready", function() {
+pleonasm.onload(function() {
 	loadTest('test_complete_dict.txt', check_file);
 	loadTest('test_hex_4.txt', check_file);
 	loadTest('test_random.txt', check_file);

@@ -10,11 +10,22 @@ var pleonasm = (function () {
 	var hex_re  = new RegExp('[^' + hex_alphabet  + ']', 'g');
 	var trsl_re = new RegExp('[^' + trsl_alphabet + ']', 'g');
 
+	var onload_callbacks = new Array();
+
 	function checkReady() {
 		if (checkDictionariesAvailable()) {
-			if (typeof jQuery !== 'undefined') {
-				$.event.trigger({ type: 'pleonasm-ready'});
+			for (var i = 0; i < onload_callbacks.length; i++) {
+				var cb = onload_callbacks.pop();
+				cb();
 			}
+		}
+	}
+
+	module.onload = function(callback) {
+		if (checkReady()) {
+			callback();
+		} else {
+			onload_callbacks.push(callback);
 		}
 	}
 
