@@ -1,8 +1,6 @@
-var pleonasm = (function () {
+(function (exports) {
   
   'use strict';
-
-  var module = {};
 
   var dicts = {};
 
@@ -14,6 +12,13 @@ var pleonasm = (function () {
 
   var onload_callbacks = [];
 
+  var isNode = (!!(typeof module !== 'undefined' && module.exports && exports === module.exports));
+
+  if (isNode) {
+    var fs = require('fs');
+    var node_path = require('path');
+  }
+
   function checkReady() {
     if (checkDictionariesAvailable()) {
       for (var i = 0; i < onload_callbacks.length; i++) {
@@ -23,7 +28,7 @@ var pleonasm = (function () {
     }
   }
 
-  module.onload = function(callback) {
+  exports.onload = function(callback) {
     if (checkReady()) {
       callback();
     } else {
@@ -67,7 +72,7 @@ var pleonasm = (function () {
     return true;
   }
 
-  module.encode = function(hex, wordDelimiter, groupDelimiter) {
+  exports.encode = function(hex, wordDelimiter, groupDelimiter) {
 
     if(typeof(wordDelimiter) === 'undefined') { wordDelimiter = ' '; }
     if(typeof(groupDelimiter) === 'undefined') { groupDelimiter = ', '; }
@@ -101,13 +106,13 @@ var pleonasm = (function () {
     }
     
     result.codeWords = codeWords;
-    result.code = module.format(codeWords, wordDelimiter, groupDelimiter);
+    result.code = exports.format(codeWords, wordDelimiter, groupDelimiter);
     result.spaced = result.code.replace(trsl_re, ' ');
 
     return result;
   };
 
-  module.format = function(codeWords, wordDelimiter, groupDelimiter) {
+  exports.format = function(codeWords, wordDelimiter, groupDelimiter) {
     
     var groups = [];
     var groupSize = treeIDs.length;
@@ -118,7 +123,7 @@ var pleonasm = (function () {
     return groups.join(groupDelimiter);
   };
 
-  module.decode = function(code) {
+  exports.decode = function(code) {
 
     var removed_redundancy = code.replace(trsl_re, '');
     var spaced = code.replace(trsl_re, ' ');
@@ -147,16 +152,32 @@ var pleonasm = (function () {
   }
 
   function loadDict(dictFileName, dataCallBack) {
-    var client = new XMLHttpRequest();
-    client.open('GET', 'dictionaries/' + dictFileName);
-    client.onreadystatechange = function() {
-      if (client.readyState === 4) {
-        var plainText = client.responseText;
+
+    function processData(plainText) {
         var lines = plainText.split('\n');
         dataCallBack(lines);
-      }
-    };
-    client.send();
+    }
+    
+    var path = 'dictionaries/' + dictFileName;
+
+    if (isNode) {
+       var path_in_pkg = node_path.resolve(__dirname, '..', path);
+       fs.readFile(path_in_pkg, function (err, data) {
+        if (err) {
+          throw err; 
+        }
+        processData(data.toString()); 
+      });
+    } else {
+      var client = new XMLHttpRequest();
+      client.open('GET', path);
+      client.onreadystatechange = function() {
+        if (client.readyState === 4) {
+          processData(client.responseText);
+        }
+      };
+      client.send();
+    }
   }
 
   function buildTree(dictID, lines) {
@@ -183,5 +204,4 @@ var pleonasm = (function () {
     }
     dicts[dictID] = tree;
   }
-  return module;
-}());
+}) (typeof exports === 'undefined' ? this['pleonasm'] = {}: exports);
