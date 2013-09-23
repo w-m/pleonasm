@@ -47,7 +47,7 @@ $(document).ready(function() {
 	createColor(null);
 });
 
-$(document).on("pleonasm-ready", function(){
+pleonasm.onload(function(){
 	var box = document.getElementById('source');
 	document.getElementById('source').onchange();
 });
