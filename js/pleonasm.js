@@ -1,178 +1,187 @@
 var pleonasm = (function () {
-	
-	var module = {};
+  
+  'use strict';
 
-	var dicts = {};
+  var module = {};
 
-	var hex_alphabet  = '0123456789abcdef';
-	var trsl_alphabet = 'ulkmhpvtwgnbcdyf';
+  var dicts = {};
 
-	var hex_re  = new RegExp('[^' + hex_alphabet  + ']', 'g');
-	var trsl_re = new RegExp('[^' + trsl_alphabet + ']', 'g');
+  var hex_alphabet  = '0123456789abcdef';
+  var trsl_alphabet = 'ulkmhpvtwgnbcdyf';
 
-	function checkReady() {
-		if (checkDictionariesAvailable()) {
-			if (typeof jQuery !== 'undefined') {
-				$.event.trigger({ type: 'pleonasm-ready'});
-			}
-		}
-	}
+  var hex_re  = new RegExp('[^' + hex_alphabet  + ']', 'g');
+  var trsl_re = new RegExp('[^' + trsl_alphabet + ']', 'g');
 
-	function initTree(id) {
-		return function(lines) {
-			buildTree(id, lines);
-			checkReady();
-		}
-	}
+  var onload_callbacks = [];
 
-	loadDict("adj.txt",  initTree('adj'));
-	loadDict("noun.txt", initTree('noun'));
-	loadDict("verb.txt", initTree('verb'));
+  function checkReady() {
+    if (checkDictionariesAvailable()) {
+      for (var i = 0; i < onload_callbacks.length; i++) {
+        var cb = onload_callbacks.pop();
+        cb();
+      }
+    }
+  }
 
-	var treeIDs = ['verb', 'adj', 'noun'];
+  module.onload = function(callback) {
+    if (checkReady()) {
+      callback();
+    } else {
+      onload_callbacks.push(callback);
+    }
+  };
 
-	function translate_from_hex(hex) {
-		for (var i = 0; i < 16; i++) {
-			hex = hex.replace(new RegExp(hex_alphabet[i], 'g'), trsl_alphabet[i]);
-		}
-		return hex;
-	}
+  function initTree(id) {
+    return function(lines) {
+      buildTree(id, lines);
+      checkReady();
+    };
+  }
 
-	function translate_to_hex(code) {
-		for (var i = 0; i < 16; i++) {
-			code = code.replace(new RegExp(trsl_alphabet[i], 'g'), hex_alphabet[i]);
-		}
-		return code;
-	}
+  loadDict('adj.txt',  initTree('adj'));
+  loadDict('noun.txt', initTree('noun'));
+  loadDict('verb.txt', initTree('verb'));
 
-	function checkDictionariesAvailable() {
-		for (var treeID = 0; treeID < treeIDs.length; treeID++) {
-			if (!(treeIDs[treeID] in dicts)) {
-				return false;
-			}
-		}
-		return true;
-	}
+  var treeIDs = ['verb', 'adj', 'noun'];
 
-	module.encode = function(hex, wordDelimiter, groupDelimiter) {
+  function translate_from_hex(hex) {
+    for (var i = 0; i < 16; i++) {
+      hex = hex.replace(new RegExp(hex_alphabet[i], 'g'), trsl_alphabet[i]);
+    }
+    return hex;
+  }
 
-		if(typeof(wordDelimiter)==='undefined') wordDelimiter = ' ';
-		if(typeof(groupDelimiter)==='undefined') groupDelimiter = ', ';
+  function translate_to_hex(code) {
+    for (var i = 0; i < 16; i++) {
+      code = code.replace(new RegExp(trsl_alphabet[i], 'g'), hex_alphabet[i]);
+    }
+    return code;
+  }
 
-		if (!checkDictionariesAvailable()) {
-			return {code: "Loading Dictionaries..."};
-		}
+  function checkDictionariesAvailable() {
+    for (var treeID = 0; treeID < treeIDs.length; treeID++) {
+      if (!(treeIDs[treeID] in dicts)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-		var result = {};
+  module.encode = function(hex, wordDelimiter, groupDelimiter) {
 
-		var hex_lower = hex.toLowerCase();
-		var filtered = hex_lower.replace(hex_re, '');
-		var translated = translate_from_hex(filtered);
+    if(typeof(wordDelimiter) === 'undefined') { wordDelimiter = ' '; }
+    if(typeof(groupDelimiter) === 'undefined') { groupDelimiter = ', '; }
 
-		result.translation = translated;
+    if (!checkDictionariesAvailable()) {
+      return {code: 'Loading Dictionaries...'};
+    }
 
-		var treeIndex = 0; 
-		var codeWords = Array();
+    var result = {};
 
-		while (translated.length > 0) {
+    var hex_lower = hex.toLowerCase();
+    var filtered = hex_lower.replace(hex_re, '');
+    var translated = translate_from_hex(filtered);
 
-			// verb, adj, noun, verb, adj, noun, ...
-			var tree = dicts[treeIDs[treeIndex % treeIDs.length]];
+    result.translation = translated;
 
-			longest = find_longest(tree, translated);
-			translated = translated.substring(longest.depth);
+    var treeIndex = 0;
+    var codeWords = [];
 
-			codeWords.push(longest.match);
+    while (translated.length > 0) {
 
-			treeIndex++;
-		}
-		
-		result.codeWords = codeWords;
-		result.code = module.format(codeWords, wordDelimiter, groupDelimiter);
-		result.spaced = result.code.replace(trsl_re, ' ');
+      // verb, adj, noun, verb, adj, noun, ...
+      var tree = dicts[treeIDs[treeIndex % treeIDs.length]];
 
-		return result;
-	}
+      var longest = find_longest(tree, translated);
+      translated = translated.substring(longest.depth);
 
-	module.format = function(codeWords, wordDelimiter, groupDelimiter) {
-		
-		var groups = Array();
-		var groupSize = treeIDs.length;
-		for (var i = 0; i < Math.ceil(codeWords.length / groupSize); i++) {
-			subGroup = codeWords.slice(i * groupSize, (i * groupSize) + groupSize);
-			groups.push(subGroup.join(wordDelimiter));
-		}
-		return groups.join(groupDelimiter);
-	}
+      codeWords.push(longest.match);
 
+      treeIndex++;
+    }
+    
+    result.codeWords = codeWords;
+    result.code = module.format(codeWords, wordDelimiter, groupDelimiter);
+    result.spaced = result.code.replace(trsl_re, ' ');
 
-	module.decode = function(code) {
+    return result;
+  };
 
-		var removed_redundancy = code.replace(trsl_re, '');
-		var spaced = code.replace(trsl_re, ' ');
-		var hex = translate_to_hex(removed_redundancy);
-		return {hex: hex, spaced: spaced, translation: removed_redundancy};
-	}
+  module.format = function(codeWords, wordDelimiter, groupDelimiter) {
+    
+    var groups = [];
+    var groupSize = treeIDs.length;
+    for (var i = 0; i < Math.ceil(codeWords.length / groupSize); i++) {
+      var subGroup = codeWords.slice(i * groupSize, (i * groupSize) + groupSize);
+      groups.push(subGroup.join(wordDelimiter));
+    }
+    return groups.join(groupDelimiter);
+  };
 
+  module.decode = function(code) {
 
-	function find_longest(tree, word) {
+    var removed_redundancy = code.replace(trsl_re, '');
+    var spaced = code.replace(trsl_re, ' ');
+    var hex = translate_to_hex(removed_redundancy);
+    return {hex: hex, spaced: spaced, translation: removed_redundancy};
+  };
 
-		var depth = 0;
-		var longest_match = null;
+  function find_longest(tree, word) {
 
-		for (var i = 0; i <= word.length; i++) {
-			sub_path = word.substring(0, i);
-			if (sub_path in tree) {
-				var match = tree[sub_path];
-				if (match != null) {
-					depth = i;
-					longest_match = match;
-				}
-			} else {
-				break
-			}
-		}
-		return {depth: depth, match: longest_match};
-	}
+    var depth = 0;
+    var longest_match = null;
 
-	function loadDict(dictFileName, dataCallBack) {
-		var client = new XMLHttpRequest();
-		client.open('GET', 'dictionaries/' + dictFileName);
-		client.onreadystatechange = function() {
-			if (client.readyState == 4) {
-				var plainText = client.responseText;
-				var lines = plainText.split('\n');
-				dataCallBack(lines);
-			}
-		}
-		client.send();
-	}
+    for (var i = 0; i <= word.length; i++) {
+      var sub_path = word.substring(0, i);
+      if (sub_path in tree) {
+        var match = tree[sub_path];
+        if (match !== null) {
+          depth = i;
+          longest_match = match;
+        }
+      } else {
+        break;
+      }
+    }
+    return {depth: depth, match: longest_match};
+  }
 
-	function buildTree(dictID, lines) {
+  function loadDict(dictFileName, dataCallBack) {
+    var client = new XMLHttpRequest();
+    client.open('GET', 'dictionaries/' + dictFileName);
+    client.onreadystatechange = function() {
+      if (client.readyState === 4) {
+        var plainText = client.responseText;
+        var lines = plainText.split('\n');
+        dataCallBack(lines);
+      }
+    };
+    client.send();
+  }
 
-		// tree-like data structure for lookup
-		// flat representation as object for faster building, access
-		var tree = {};
+  function buildTree(dictID, lines) {
 
-		for (var i = 0; i < lines.length; i++) {
-			// create keys by removing redundant characters
-			var filtered_line = lines[i].replace(trsl_re, '');
+    // tree-like data structure for lookup
+    // flat representation as object for faster building, access
+    var tree = {};
 
-			// create empty nodes on the way to the key
-			// e.g. b = null, bc = null when inserting bcd = braced
-			// --> to know when to stop the lookup
-			for (var j = 0; j < filtered_line.length; j++) {
-				sub_path = filtered_line.substring(0, j);
-				if (!(sub_path in tree)) {
-					tree[sub_path] = null;
-				}
-			}	
+    for (var i = 0; i < lines.length; i++) {
+      // create keys by removing redundant characters
+      var filtered_line = lines[i].replace(trsl_re, '');
 
-			// actual lookup table
-			tree[filtered_line] = lines[i];
-		}
-		dicts[dictID] = tree;
-	}	
-
-	return module;
+      // create empty nodes on the way to the key
+      // e.g. b = null, bc = null when inserting bcd = braced
+      // --> to know when to stop the lookup
+      for (var j = 0; j < filtered_line.length; j++) {
+        var sub_path = filtered_line.substring(0, j);
+        if (!(sub_path in tree)) {
+          tree[sub_path] = null;
+        }
+      }
+      // actual lookup table
+      tree[filtered_line] = lines[i];
+    }
+    dicts[dictID] = tree;
+  }
+  return module;
 }());
