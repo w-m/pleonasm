@@ -3,6 +3,8 @@ pleonasm
 
 Create English phrases from hex strings that are easier to recognize and remember
 
+Try it out: http://w-m.github.io/pleonasm/
+
 
 ### Javascript API
 
