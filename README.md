@@ -12,6 +12,8 @@ Create English phrases from hex strings that are easier to recognize and remembe
 
 Register a function to be called when the when the dictionaries are loaded and pleonasm is ready to use.
 
+------------------------------------
+
 ```Javascript
 .encode('601a9f')
 ```
@@ -37,6 +39,7 @@ Can take wordDelimiter and groupDelimiter as additional arguments (see .format).
   code: 'rule_veterinarian_move/care_fewer_mark',
   spaced: ' ul  v t   n    n m v  c    f w   m  k' }
 ```  
+------------------------------------
 
 ```Javascript
 .decode('visualizing free')
@@ -50,6 +53,8 @@ Decode an English phrase to get a hex number.
   translation: 'vulngf' }
 ```
 
+------------------------------------
+
 ```Javascript
 .format(codeWords, wordDelimiter, groupDelimiter)
 ```
@@ -60,30 +65,34 @@ Format an array of code words into a string. Words are connected with wordDelimi
 
 Files needed:
 ```
-- dictionaries
+dictionaries/
 -- adj.txt
 -- noun.txt
 -- verb.txt
-- js
+js/
 -- pleonasm.js
 ```
 
-```Javascript
+```HTML
 <script src="js/pleonasm.js"></script>
 <script>
-pleonasm.onload(function() {
-  var encoded = pleonasm.encode('ad3a507').code;
-});
+  pleonasm.onload(function() {
+    var encoded = pleonasm.encode('ad3a507').code;
+  });
 </script>
 ```
 
 ### node.js
+
+Install via npm:
 
 ```
 npm install pleonasm
 
 npm test pleonasm
 ```
+
+Usage:
 
 ```Javascript
 var pleonasm = require('pleonasm');
@@ -100,10 +109,10 @@ from pleonasm import Encoder, decode
 
 enc = Encoder('../dictionaries')
 encoded = enc.encode('601a9f')
-print encoded
+print encoded # 'visualizing free'
 
 decoded = decode('rule_veterinarian_move')
-print decoded
+print decoded # '0167aa36'
 ```
 
 ### Acknowledgements and other projects
