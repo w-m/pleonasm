@@ -43,9 +43,13 @@ function createColor(button) {
 	document.getElementById('source').onchange();
 }
 
-$(document).ready(function() {
-	createColor(null);
-});
+if (window.addEventListener) {
+	window.addEventListener("load", createColor, false);
+} else if (window.attachEvent) {
+	window.attachEvent("onload", createColor);
+} else {
+	window.onload = createColor;
+}
 
 pleonasm.onload(function(){
 	var box = document.getElementById('source');
