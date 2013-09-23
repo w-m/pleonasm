@@ -16,6 +16,7 @@
 
   if (isNode) {
     var fs = require('fs');
+    var node_path = require('path');
   }
 
   function checkReady() {
@@ -160,7 +161,8 @@
     var path = 'dictionaries/' + dictFileName;
 
     if (isNode) {
-      fs.readFile(path, function (err, data) {
+       var path_in_pkg = node_path.resolve(__dirname, '..', path);
+       fs.readFile(path_in_pkg, function (err, data) {
         if (err) {
           throw err; 
         }
