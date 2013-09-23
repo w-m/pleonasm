@@ -1,0 +1,37 @@
+{
+    "name": "pleonasm",
+    "description": "Create English phrases from hex numbers",
+    "version": "1.0.0",
+    "author": {
+        "name": "Wieland Morgenstern"
+    },
+    "keywords": [
+        "hex",
+        "hash",
+        "base16"
+    ],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://creativecommons.org/licenses/MIT/"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/w-m/pleonasm.git"
+    },
+    "bugs": "http://github.com/w-m/pleonasm/issues",
+    "engines": {
+        "node": ">=0.4.0"
+    },
+    "directories": {
+        "tests": "./tests",
+        "example": "./example",
+        "dictionaries": "./dictionaries"
+    },
+    "main": "./js/pleonasm.js",
+    "scripts": {
+        "test": "node tests/test.js"
+    },
+    "readmeFilename": "README.md"
+}
