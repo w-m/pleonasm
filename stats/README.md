@@ -27,8 +27,9 @@ Pleonasm phrases are around 2.6 times as long as the hex input (this counts char
 | 8          | 3.56       | 21.04              | 2.63   |
 | 10         | 4.417      | 26.815             | 2.68   |
 | 16         | 6.785      | 42.502             | 2.66   |
-| 20         | 8.426255   | 53.126             | 2.66   |
-| 40         | 16.415488  | 106.519            | 2.66   |
+| 20         | 8.427      | 53.126             | 2.66   |
+| 40         | 16.415     | 106.519            | 2.66   |
+| 100        | 40.437     | 266.40             | 2.66   |
 
 For the hex lengths <= 7, all possible values were computed. For length 8 and over, a million random samples were chosen each.
 
